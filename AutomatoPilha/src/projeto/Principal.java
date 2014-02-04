@@ -5,23 +5,37 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import dominios.Entrada;
+
 public class Principal {
 
 	public static void main (String [] args) throws FileNotFoundException {
 		
-		ArrayList<String> Lista = new ArrayList<String>();
+		ArrayList<Entrada> Lista = new ArrayList<Entrada>();
 		
 		// Parser
 		Scanner scanner = new Scanner(new FileReader("arquivo.txt"));
 		scanner.useDelimiter(",");
 		while (scanner.hasNext()) {
-			Lista.add(scanner.next());
+			String dadoScan = scanner.next();
+			String x = dadoScan.replaceAll("(.)->.*", "$1");
+			String y = dadoScan.replaceAll(".->(.*)", "$1");
+			Entrada entrada = new Entrada(dadoScan,x,y);
+			Lista.add(entrada);
 		}
 		
-		for(String lista :Lista){
-			System.out.println(lista);
+		for(Entrada lista :Lista){
+			System.out.println("Completo "+lista.getCompleto()+" ** Esq "+lista.getEsquerda()+" ** Dir "+lista.getDireita());
 		}
 		
-		
+		System.out.println(getVariavelInicial(Lista)); 
+	}
+	
+	public static String getVariavelInicial(ArrayList<Entrada> lista){
+		if(lista.size()>0){
+			return lista.get(0).getEsquerda();
+		}
+		else
+			return null;
 	}
 }
