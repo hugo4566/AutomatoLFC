@@ -17,11 +17,7 @@ public class Principal {
 		Scanner scanner = new Scanner(new FileReader("arquivo.txt"));
 		scanner.useDelimiter(",");
 		while (scanner.hasNext()) {
-			String dadoScan = scanner.next();
-			String x = dadoScan.replaceAll("(.)->.*", "$1");
-			String y = dadoScan.replaceAll(".->(.*)", "$1");
-			Entrada entrada = new Entrada(dadoScan,x,y);
-			Lista.add(entrada);
+			Lista.add(setEntrada(scanner.next()));
 		}
 		
 		for(Entrada lista :Lista){
@@ -37,5 +33,12 @@ public class Principal {
 		}
 		else
 			return null;
+	}
+	
+	public static Entrada setEntrada(String str){
+		String x = str.replaceAll("(.)->.*", "$1");
+		String y = str.replaceAll(".->(.*)", "$1");
+		Entrada entrada = new Entrada(str,x,y);
+		return entrada;
 	}
 }
