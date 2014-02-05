@@ -1,0 +1,78 @@
+Segundo Trabalho (Entrega: até 12/02/2014 23:59)
+
+O objetivo do segundo trabalho é implementar um programa que possa decidir se um conjunto de cadeias (dadas como entrada) pode ser gerado por uma gramática livre de contexto (também dada como entrada).
+Para tanto você deve fazer a transformação da GLC em um autômato com pilha e, a seguir, verificar se o AP aceita cada uma das cadeias do conjunto dado como entrada. Contudo, devemos lembrar que a transformação de uma GLC em um AP pode gerar um AP não-determinístico e precisamos de uma forma de lidar com esse não-determinismo de uma forma determinística.
+A forma de lidar com o não determinismo é simples. Construiremos uma tabela que relaciona terminais, variáveis e produções. Isto é, para cada variável da gramática teremos uma linha na tabela e para cada terminal da gramática teremos uma coluna na tabela. Cada célula da tabela conterá a produção (ou transição do autômato) que será usada quando a variável correspondente àquela linha for encontrada no topo da pilha e o terminal correspondente àquela coluna for encontrado na entrada. Resta agora saber como construir essa tabela que guiará nossas decisões, chamaremos ela de tabela M[N, T], em referência aos Não-terminais nas linhas e Terminais nas colunas.
+A construção da tabela M[N,T] exige a computação dos chamados conjuntos Primeiros e conjuntos de Sequência. Neste ponto você não precisa entender o significado destes conjuntos, apenas implementar corretamente os algoritmos de construção dos mesmos.
+
+Para a computação dos conjuntos Primeiro temos três casos:
+
+1) Computação dos conjuntos Primeiro(a), onde a é um terminal. Este é o caso trivial, pois Primeiro(a) = {a}.
+2) Computação dos conjuntos Primeiro(A), onde A é um não-terminal:
+
+for cada não-terminal A do Primeiro(A) := {};
+while houver alterações em algum Primeiro(A) do
+	for cada escolha de produção A -> X_1X_2...X_n do
+		k := 1; Continue := true;
+		while Continue = true and k <= n do
+			acrescente Primeiro(X_k)-{epsilon} a Primeiro(A);
+			if epsilon não pertencer a Primeiro(X_k) then Continue := false;
+			k := k + 1;
+		if Continue := true then acrescente epsilon a Primeiro(A);
+		
+3) Computação do conjunto Primeiro(w), onde w = X_1X_2...X_n é uma cadeia de terminais e de não-terminais:
+
+Primeiro(w) := Primeiro(X_1) - {epsilon};
+if Primeiro(X_1) contiver epsilon then
+	vazio := true;
+for cada i = 2 até n do
+	if vazio = false then break;
+	for cada k = 1 até i-1 do
+		if Primeiro(X_k) não contiver epsilon then vazio := false;
+	if vazio = true then adicione Primeiro(X_i)- {epsilon} a Primeiro(w);
+if vazio = true then adicione {epsilon} a Primeiro(w);
+
+Os conjuntos de Sequência são definidos apenas para não-terminais, assim, a computação de Sequencia(A) é dada pelo seguinte algoritmo:
+
+Sequencia(variável inicial) := {$};
+for cada não-terminal A <> variável inicial do Sequencia(A) := {};
+while houver alterações em algum conjunto de Sequência do
+	for cada produção A -> X_1X_2...X_n do
+		for each X_i que for não terminal do
+			adicione Primeiro(X_i+1 X_i+2 ... X_n) - {epsilon} a Sequencia(X_i);
+			(* Nota: se i = n, então X_i+1 X_i+2 ... X_n = epsilon *)
+			if epsilon estiver em Primeiro(X_i+1 X_i+2 ... X_n) then
+				adicione Sequencia(A) a Sequencia(X_i)
+
+Agora podemos construir a tabela M[N, T] da seguinte forma:
+
+Para cada não-terminal A e escolha de produção A -> w, repita os dois passos a seguir:
+	1. Para cada terminal a em Primeiro(w), adicione A -> w a M[A, a].
+	2. Se epsilon perterncer a Primeiro(w), para cada elemento a de Sequencia(A), adicione A -> w a M[A,a].
+	
+
+	
+Formato da entrada:
+
+A entrada do programa será uma GLC na primeira linha e palavras nas linhas seguintes. A entrada termina com uma linha em branco. Perceba que haverá exatamente uma palavra por linha na entrada. A entrada deve ser lida da entrada padrão.
+
+Formato das GLCs:
+- A GLC será representada pelo seu conjunto de produções.
+- As produções serão separadas por vírgulas, logo, este símbolo não poderá ser usado como terminal ou não-terminal nas gramáticas.
+- O símbolo -> separa os lados esquerdo e direito de cada produção, logo, este símbolo também é reservado.
+- O símbolo à esquerda da primeira produção da gramática é a variável inicial.
+- As variáveis podem ser identificadas verificando-se os símbolos que aparecem à esquerda das produções.
+- Variáveis e terminais são compostas por um único símbolo (um char).
+- 'E' (sem as aspas) representa a palavra vazia
+ 
+Formato da saída:
+Para cada palavra da entrada que for aceita será impresso 1 na saída padrão em uma única linha
+Se a cadeia não for aceita, será impresso 0
+ 
+Cada aluno deve criar um novo branch no repositório já criado no github.
+ 
+Lembrem de comentar seus códigos.
+ 
+att.
+ 
+Breno Piva
