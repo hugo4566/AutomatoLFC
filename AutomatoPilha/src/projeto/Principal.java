@@ -3,6 +3,7 @@ package projeto;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Scanner;
 
@@ -12,13 +13,14 @@ public class Principal {
 
 	static HashSet<String> conjuntoVariaveis;
 	static HashSet<String> conjuntoTerminais;
+	static ArrayList<Entrada> Lista;
 	
 	public static void main (String [] args) throws FileNotFoundException {
 		
 		conjuntoVariaveis = new HashSet<String>();
 		conjuntoTerminais = new HashSet<String>();
 		
-		ArrayList<Entrada> Lista = new ArrayList<Entrada>();
+		Lista = new ArrayList<Entrada>();
 		
 		// Parser
 		Scanner scanner = new Scanner(new FileReader("arquivo.txt"));
@@ -38,11 +40,127 @@ public class Principal {
 
 		imprimirTodasVariaveis();
 		imprimirTodosTerminais();
+		
+		HashMap<String, HashSet<String>> Primeiro = new HashMap<String, HashSet<String>>();
+		
+		HashSet<String> vazio = new HashSet<String>();		// conjunto vazio
+		for(String variavel:conjuntoVariaveis){
+			Primeiro.put(variavel, vazio);					// Primeiro(variavel,{})
+		}
+		
+		for(String variavel:conjuntoTerminais){
+			Primeiro.put(variavel, vazio);					// Primeiro(variavel,{})
+		}
+		
+		String simbolo = "S";
+		imprimaConjunto(Primeiro.get(simbolo));
+		Casos(Primeiro,simbolo);
+		imprimaConjunto(Primeiro.get(simbolo));
 	}
 	
-	public void Primeiro(){
+	public static void Casos(HashMap<String, HashSet<String>> Primeiro, String simbolo){
+		switch(distinguirCasos(simbolo)){
+		case 1:
+			System.out.println("É um terminal");
+			HashSet<String> conjunto = new HashSet<String>();	// ele vem vazio
+			conjunto.add(simbolo);								// adiciona o terminal ao conjunto
+			Primeiro.put(simbolo, conjunto);
+			break;
+		case 2:
+			System.out.println("É uma variavel");
+			boolean alterou = true;
+			
+			ArrayList<Entrada> listaProducoesSimbolo = new ArrayList<Entrada>();
+			listaProducoesSimbolo.addAll(producoesDoSimbolo(simbolo));
+			while(alterou){
+				for(Entrada producao : listaProducoesSimbolo){
+					System.out.println("Producao : " + producao.getCompleto());
+					
+					
+					HashSet<String> conjuntoAuxSimbolo = new HashSet<String>();		// Armazena o conjunto daquele simbolo
+					conjuntoAuxSimbolo.addAll(Primeiro.get(simbolo));				// para ver se tem ou não alteracoes
+					
+					int k =1;
+					boolean Continue = true;
+					int n = producao.getDireita().length();
+					while(Continue && k<=n){
+						Continue = false;
+						String simboloK = producao.getDireita().charAt(k-1)+"";
+						if(isTerminal(simboloK)){
+							Primeiro.get(simbolo).add(simboloK);
+						}else
+							Primeiro.get(simbolo).addAll(Primeiro.get(producao.getDireita().charAt(k-1)));
+						Primeiro.get(simbolo).remove("E");
+						
+						HashSet<String> conjuntoTeste = new HashSet<String>();
+						conjuntoTeste.addAll(Primeiro.get(simbolo));
+						if(conjuntoTeste.add("E")){		// nao tem Epsilon
+							Continue = false;
+						}
+						k++;
+					}
+					
+					if(Continue){
+						Primeiro.get(simbolo).add("E");
+					}
+					
+					
+					if(conjuntoAuxSimbolo.equals(Primeiro.get("E"))){
+						alterou = false;
+					}
+				}
+			}
+			
+			break;
+		case 3:
+			System.out.println("É uma cadeia");
+			break;
+		case 0:
+			System.out.println("É um epsilon");
+			break;
+		}
+	}
+	
+	public static int distinguirCasos(String simbolo){
+			if(simbolo.length() == 1){
+				if(isTerminal(simbolo))
+					return 1;
+				else if(isVariavel(simbolo))
+					return 2;
+			}else{
+				return 3;
+			}
+			return 0;
+	}
+	
+	public static ArrayList<Entrada> producoesDoSimbolo(String simbolo){
+		ArrayList<Entrada> listaProducoes = new ArrayList<Entrada>();
 		
-//		switch
+		for(Entrada lista : Lista){
+			if(lista.getEsquerda().equals(simbolo))
+				listaProducoes.add(lista);
+		}
+		
+		if(listaProducoes.size()>0)
+			return listaProducoes;
+		else
+			return null;	
+	}
+	
+	public static void imprimaConjunto(HashSet<String> conjunto){
+		try {
+			System.out.println("-------Conjunto-------");
+			if(conjunto.size() == 0){
+				System.out.println("Conjunto vazio");
+			}
+			else{
+				for(String conj : conjunto){
+					System.out.println(conj);
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("Não tem conjunto! Não eh que esteja vazia, só não existe!");
+		}
 	}
 
 	public static boolean isTerminal(String simbolo){
