@@ -10,10 +10,13 @@ import dominios.Entrada;
 
 public class Principal {
 
+	static HashSet<String> conjuntoVariaveis;
+	static HashSet<String> conjuntoTerminais;
+	
 	public static void main (String [] args) throws FileNotFoundException {
 		
-		HashSet<String> conjuntoVariaveis = new HashSet<String>();
-		HashSet<String> conjuntoTerminais = new HashSet<String>();
+		conjuntoVariaveis = new HashSet<String>();
+		conjuntoTerminais = new HashSet<String>();
 		
 		ArrayList<Entrada> Lista = new ArrayList<Entrada>();
 		
@@ -33,33 +36,34 @@ public class Principal {
 		conjuntoVariaveis = todasVariaveis(conjuntoVariaveis, Lista);
 		conjuntoTerminais = todosTerminais(conjuntoTerminais,conjuntoVariaveis, Lista);
 
-		imprimirTodasVariaveis(conjuntoVariaveis);
-		imprimirTodosTerminais(conjuntoTerminais);
+		imprimirTodasVariaveis();
+		imprimirTodosTerminais();
+	}
+	
+	public void Primeiro(){
 		
-		
-		//algum for{};		for cada não-terminal A do Primeiro(A) := {};
-		//algum while{		while houver alterações em algum Primeiro(A) do {
-		for(Entrada listaEntrada :Lista){
-			int n = listaEntrada.getDireita().length();
-			int k =1; boolean Continue = true;
-			while(Continue && k<=n){
-				//Escreva alguma besteira aki
-//				acrescente Primeiro(X_k)-{epsilon} a Primeiro(A);
-//				if epsilon não pertencer a Primeiro(X_k) then Continue := false;
-				k = k+1;
-				if(Continue == true){
-					//Escreva alguma besteira aki
-//					then acrescente epsilon a Primeiro(A);
-				}
-			}
-		}
-		//};
-				
+//		switch
 	}
 
+	public static boolean isTerminal(String simbolo){
+		HashSet<String> temp = new HashSet<String>(); 
+		temp.addAll(conjuntoVariaveis);
+		if(temp.add(simbolo) && !simbolo.equals("E"))
+			return true;
+		else
+			return false;
+	}
+	
+	public static boolean isVariavel(String simbolo){
+		HashSet<String> temp = new HashSet<String>(); 
+		temp.addAll(conjuntoVariaveis);
+		if(!temp.add(simbolo))
+			return true;
+		else
+			return false;
+	}
 
-
-	public static void imprimirTodasVariaveis(HashSet<String> conjuntoVariaveis) {
+	public static void imprimirTodasVariaveis() {
 		System.out.println("-------Variaveis--------");
 		
 		for(String conjV :conjuntoVariaveis){
@@ -67,7 +71,7 @@ public class Principal {
 		}
 	}
 	
-	public static void imprimirTodosTerminais(HashSet<String> conjuntoTerminais) {
+	public static void imprimirTodosTerminais() {
 		System.out.println("-------Terminais--------");
 		
 		for(String conjT :conjuntoTerminais){
@@ -82,7 +86,7 @@ public class Principal {
 		temp.addAll(conjV);
 		for(Entrada lista :Lista){
 			for(int x=0; x<lista.getDireita().length();x++){
-				if(temp.add(lista.getDireita().charAt(x)+"") && !(lista.getDireita().charAt(x)+"").equals("E"))
+				if(isTerminal(lista.getDireita().charAt(x)+""))
 					conjT.add(lista.getDireita().charAt(x)+"");
 			}
 		}
