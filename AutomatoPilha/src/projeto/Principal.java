@@ -30,17 +30,13 @@ public class Principal {
 			Lista.add(setEntrada(scanner.next()));
 		}
 		
-		for(Entrada lista :Lista){
-//			System.out.println("Completo "+lista.getCompleto()+" ** Esq "+lista.getEsquerda()+" ** Dir "+lista.getDireita());
-		}
-		
 		conjuntoVariaveis = todasVariaveis(conjuntoVariaveis, Lista);
 		conjuntoTerminais = todosTerminais(conjuntoTerminais,conjuntoVariaveis, Lista);
 		conjuntoSimbolos.addAll(conjuntoVariaveis);
 		conjuntoSimbolos.addAll(conjuntoTerminais);
 
-		imprimirTodasVariaveis();
-		imprimirTodosTerminais();
+//		imprimirTodasVariaveis();
+//		imprimirTodosTerminais();
 		
 		HashMap<String, HashSet<String>> Primeiro = new HashMap<String, HashSet<String>>();
 		HashMap<String, HashSet<String>> Sequencia = new HashMap<String, HashSet<String>>();
@@ -60,49 +56,94 @@ public class Principal {
 		// Caso 3 -- faco Primeiro(w), onde w = X_1X_2...X_n
 //		doCaso3(Primeiro);
 		
-//		doPasso4(Sequencia);
+//		doPasso4(Sequencia,Primeiro);
 		
 		for(String variavel:conjuntoVariaveis){
 			imprimaConjunto(Primeiro.get(variavel));
 		}
 	}
 
-	private static void doPasso4(HashMap<String, HashSet<String>> Sequencia) {
+	private static void doPasso4(HashMap<String, HashSet<String>> Sequencia,HashMap<String, HashSet<String>> Primeiro) {
 		
-//		Sequencia(variável inicial) := {$};
+		// Sequencia(variável inicial) := {$};
 		HashSet<String> cj = new HashSet<String>();
 		cj.add("$");
 		Sequencia.put("§", cj);
 		
-//		for cada não-terminal A <> variável inicial do Sequencia(A) := {};
+		// for cada não-terminal A <> variável inicial do Sequencia(A) := {};
 		for(String variavel: conjuntoVariaveis){
 			HashSet<String> vazio = new HashSet<String>();
 			Sequencia.put(variavel, vazio);
 		}
 		
+		int somaAnterior = somaDosConjuntosSequencia(Sequencia);
+		
 		boolean alteracao = true;
 		while(alteracao){
+			alteracao = false;
+			
 			for(String variavel:conjuntoVariaveis){
 				String simbolo = variavel;
 				ArrayList<Entrada> listaProducoesSimbolo = new ArrayList<Entrada>();
 				listaProducoesSimbolo.addAll(producoesDoSimbolo(simbolo));
 				
 				for(Entrada producao : listaProducoesSimbolo){
-					for(int i=1;i<producao.getDireita().length();i++){
+					int n = producao.getDireita().length();
+					
+					for(int i=1;i<=n;i++){
 						String simboloI = producao.getDireita().charAt(i-1)+"";
 						if(isVariavel(simboloI)){
+							String cadeia = getCadeia(producao.getDireita(),i-1);
+							System.out.println(cadeia);
 							
+//							adicione Primeiro(X_i+1 X_i+2 ... X_n) - {epsilon} a Sequencia(X_i);
+							HashSet<String> conjuntoTesteK = new HashSet<String>();
+							conjuntoTesteK.addAll(Primeiro.get(cadeia));
+							conjuntoTesteK.remove("E");
+
+							Sequencia.get(simbolo).addAll(conjuntoTesteK);
+
+							// Testa se contem ou nao Epsilon
+							HashSet<String> conjuntoTeste = new HashSet<String>();
+							conjuntoTeste.addAll(Primeiro.get(cadeia));
+							
+							
+							
+//							if epsilon estiver em Primeiro(X_i+1 X_i+2 ... X_n) then
+//							adicione Sequencia(A) a Sequencia(X_i)
+							if(!conjuntoTeste.add("E")){		// se tem Epsilon
+								HashSet<String> conjuntoA = new HashSet<String>();
+								conjuntoA.addAll(Sequencia.get(variavel));
+								Sequencia.get(simboloI).addAll(conjuntoA);
+							}
 						}
+						
+						if(somaAnterior != somaDosConjuntosSequencia(Sequencia)){
+							alteracao = true;
+						}
+
+						somaAnterior = somaDosConjuntosSequencia(Sequencia);
 					}
 				}
 			}
 		}
-		
-//				for each X_i que for não terminal do
-//					adicione Primeiro(X_i+1 X_i+2 ... X_n) - {epsilon} a Sequencia(X_i);
-//					(* Nota: se i = n, então X_i+1 X_i+2 ... X_n = epsilon *)
-//					if epsilon estiver em Primeiro(X_i+1 X_i+2 ... X_n) then
-//						adicione Sequencia(A) a Sequencia(X_i)
+	}
+
+	private static String getCadeia(String direita, int posicao) {
+//		(* Nota: se i = n, então X_i+1 X_i+2 ... X_n = epsilon *)
+		int tamanhoCadeia = direita.length();
+		String cadeia = "";
+		if(posicao == tamanhoCadeia-1){
+			return "E";	//
+		}else{
+			for(int i = posicao;i<tamanhoCadeia;i++){
+				if(i==posicao){}
+				else{
+					cadeia = cadeia+direita.charAt(i);
+				}
+			}
+			return cadeia;
+		}
 	}
 
 	private static void doCaso1(HashMap<String, HashSet<String>> Primeiro) {
@@ -121,7 +162,7 @@ public class Principal {
 			Primeiro.put(variavel, cjV);
 		}
 				
-		int somaAnterior = somaDosConjuntos(Primeiro);
+		int somaAnterior = somaDosConjuntosPrimeiros(Primeiro);
 		
 		boolean alteracao = true;
 		while(alteracao){
@@ -159,11 +200,11 @@ public class Principal {
 					}
 
 					
-					if(somaAnterior != somaDosConjuntos(Primeiro)){
+					if(somaAnterior != somaDosConjuntosPrimeiros(Primeiro)){
 						alteracao = true;
 					}
 
-					somaAnterior = somaDosConjuntos(Primeiro);
+					somaAnterior = somaDosConjuntosPrimeiros(Primeiro);
 				}
 			}
 		}
@@ -171,10 +212,19 @@ public class Principal {
 	
 	private static void doCaso3(HashMap<String, HashSet<String>> Primeiro) {}
 	
-	private static int somaDosConjuntos(HashMap<String, HashSet<String>> Primeiro) {
+	private static int somaDosConjuntosPrimeiros(HashMap<String, HashSet<String>> Primeiro) {
 		int soma = 0;
 		for(String variavel:conjuntoSimbolos){
 			soma = soma + Primeiro.get(variavel).size();
+		}
+		soma++;	// para o epsilon
+		return soma;
+	}
+	
+	private static int somaDosConjuntosSequencia(HashMap<String, HashSet<String>> Sequencia) {
+		int soma = 0;
+		for(String variavel:conjuntoVariaveis){
+			soma = soma + Sequencia.get(variavel).size();
 		}
 		soma++;	// para o epsilon
 		return soma;
