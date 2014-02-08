@@ -58,9 +58,9 @@ public class Principal {
 		doCaso2(Primeiro);
 		
 		// Caso 3 -- faco Primeiro(w), onde w = X_1X_2...X_n
-		doCaso3(Primeiro);
+//		doCaso3(Primeiro);
 		
-		doPasso4(Sequencia);
+//		doPasso4(Sequencia);
 		
 		for(String variavel:conjuntoVariaveis){
 			imprimaConjunto(Primeiro.get(variavel));
@@ -115,63 +115,70 @@ public class Principal {
 
 	private static void doCaso2(HashMap<String, HashSet<String>> Primeiro) {
 		
-		HashMap<String, HashSet<String>> PrimeiroAntigo = new HashMap<String, HashSet<String>>();
-		
 		// Iniciei Primeiro(variavel) = {}
 		for(String variavel:conjuntoVariaveis){
 			HashSet<String> cjV = new HashSet<String>();
 			Primeiro.put(variavel, cjV);
 		}
-		
-		// Cria copia do antigo
-		PrimeiroAntigo.putAll(Primeiro);
+				
+		int somaAnterior = somaDosConjuntos(Primeiro);
 		
 		boolean alteracao = true;
 		while(alteracao){
+			alteracao = false;
 			
 			for(String variavel:conjuntoVariaveis){
-			String simbolo = variavel;
-			ArrayList<Entrada> listaProducoesSimbolo = new ArrayList<Entrada>();
-			listaProducoesSimbolo.addAll(producoesDoSimbolo(simbolo));
-			
-			for(Entrada producao : listaProducoesSimbolo){
-				int n = producao.getDireita().length();
-				
-				int k =1; boolean Continue = true;
-				while(Continue && k<=n){
-					String simboloK = producao.getDireita().charAt(k-1)+"";
-					
-					HashSet<String> conjuntoTesteK = new HashSet<String>();
-					conjuntoTesteK.addAll(Primeiro.get(simboloK));
-					conjuntoTesteK.remove("E");
-					
-					Primeiro.get(simbolo).addAll(conjuntoTesteK);
-					
-					// Testa se contem ou nao Epsilon
-					HashSet<String> conjuntoTeste = new HashSet<String>();
-					conjuntoTeste.addAll(Primeiro.get(simboloK));
-					if(conjuntoTeste.add("E")){		// nao tem Epsilon
-						Continue = false;
+				String simbolo = variavel;
+				ArrayList<Entrada> listaProducoesSimbolo = new ArrayList<Entrada>();
+				listaProducoesSimbolo.addAll(producoesDoSimbolo(simbolo));
+
+				for(Entrada producao : listaProducoesSimbolo){
+					int n = producao.getDireita().length();
+
+					int k =1; boolean Continue = true;
+					while(Continue && k<=n){
+						String simboloK = producao.getDireita().charAt(k-1)+"";
+
+						HashSet<String> conjuntoTesteK = new HashSet<String>();
+						conjuntoTesteK.addAll(Primeiro.get(simboloK));
+						conjuntoTesteK.remove("E");
+
+						Primeiro.get(simbolo).addAll(conjuntoTesteK);
+
+						// Testa se contem ou nao Epsilon
+						HashSet<String> conjuntoTeste = new HashSet<String>();
+						conjuntoTeste.addAll(Primeiro.get(simboloK));
+						if(conjuntoTeste.add("E")){		// nao tem Epsilon
+							Continue = false;
+						}
+						k++;
 					}
-					k++;
+
+					if(Continue){
+						Primeiro.get(simbolo).add("E");
+					}
+
+					
+					if(somaAnterior != somaDosConjuntos(Primeiro)){
+						alteracao = true;
+					}
+
+					somaAnterior = somaDosConjuntos(Primeiro);
 				}
-				
-				if(Continue){
-					Primeiro.get(simbolo).add("E");
-				}
-			}
-			
-			if(!PrimeiroAntigo.equals(Primeiro)){
-				alteracao = false;
-			}
-			
-//			System.out.println("Primeiro : "+Primeiro.toString()+"\n"+"PrimeiroAntigo : "+PrimeiroAntigo.toString());
-			PrimeiroAntigo.putAll(Primeiro);
 			}
 		}
 	}
 	
 	private static void doCaso3(HashMap<String, HashSet<String>> Primeiro) {}
+	
+	private static int somaDosConjuntos(HashMap<String, HashSet<String>> Primeiro) {
+		int soma = 0;
+		for(String variavel:conjuntoSimbolos){
+			soma = soma + Primeiro.get(variavel).size();
+		}
+		soma++;	// para o epsilon
+		return soma;
+	}
 	
 	public static ArrayList<Entrada> producoesDoSimbolo(String simbolo){
 		ArrayList<Entrada> listaProducoes = new ArrayList<Entrada>();
