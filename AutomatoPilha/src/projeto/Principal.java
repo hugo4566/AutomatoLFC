@@ -23,17 +23,14 @@ public class Principal {
 		Lista = new ArrayList<Entrada>();
 		
 		// Parser
-		Scanner scanner = new Scanner(new FileReader("arquivo.txt"));
-		scanner.useDelimiter(",");
+		Scanner scanner = new Scanner(new FileReader("arquivo.txt")).useDelimiter(",");
 		while (scanner.hasNext()) {
 			Lista.add(setEntrada(scanner.next()));
 		}
 		
 		for(Entrada lista :Lista){
-			System.out.println("Completo "+lista.getCompleto()+" ** Esq "+lista.getEsquerda()+" ** Dir "+lista.getDireita());
+//			System.out.println("Completo "+lista.getCompleto()+" ** Esq "+lista.getEsquerda()+" ** Dir "+lista.getDireita());
 		}
-		
-		System.out.println("Variavel Inicial: "+getVariavelInicial(Lista)+"\n");
 		
 		conjuntoVariaveis = todasVariaveis(conjuntoVariaveis, Lista);
 		conjuntoTerminais = todosTerminais(conjuntoTerminais,conjuntoVariaveis, Lista);
@@ -43,94 +40,77 @@ public class Principal {
 		
 		HashMap<String, HashSet<String>> Primeiro = new HashMap<String, HashSet<String>>();
 		
-		HashSet<String> vazio = new HashSet<String>();		// conjunto vazio
-		for(String variavel:conjuntoVariaveis){
-			Primeiro.put(variavel, vazio);					// Primeiro(variavel,{})
-		}
+		// Primeiro Epsilon
+		HashSet<String> cj = new HashSet<String>();
+		cj.add("E");
+		Primeiro.put("E", cj);	
 		
-		for(String variavel:conjuntoTerminais){
-			Primeiro.put(variavel, vazio);					// Primeiro(variavel,{})
-		}
 		
-		String simbolo = "S";
-		imprimaConjunto(Primeiro.get(simbolo));
-		Casos(Primeiro,simbolo);
-		imprimaConjunto(Primeiro.get(simbolo));
+		// Caso 1 -- faÁo Primeiro(a) = {a}
+		doCaso1(Primeiro);
+		
+		// Caso 2 -- faco Primeiro(A):
+		doCaso2(Primeiro);
 	}
-	
-	public static void Casos(HashMap<String, HashSet<String>> Primeiro, String simbolo){
-		switch(distinguirCasos(simbolo)){
-		case 1:
-			System.out.println("√â um terminal");
-			HashSet<String> conjunto = new HashSet<String>();	// ele vem vazio
-			conjunto.add(simbolo);								// adiciona o terminal ao conjunto
-			Primeiro.put(simbolo, conjunto);
-			break;
-		case 2:
-			System.out.println("√â uma variavel");
-			boolean alterou = true;
-			
+
+	private static void doCaso1(HashMap<String, HashSet<String>> Primeiro) {
+		for(String variavel:conjuntoTerminais){
+			HashSet<String> cjT = new HashSet<String>();
+			cjT.add(variavel);
+			Primeiro.put(variavel, cjT);
+		}
+	}
+
+	private static void doCaso2(HashMap<String, HashSet<String>> Primeiro) {
+		
+		HashMap<String, HashSet<String>> PrimeiroAntigo = new HashMap<String, HashSet<String>>();
+		
+		// Iniciei Primeiro(variavel) = {}
+		for(String variavel:conjuntoVariaveis){
+			HashSet<String> cjV = new HashSet<String>();
+			Primeiro.put(variavel, cjV);
+		}
+		
+		// Cria copia do antigo
+		PrimeiroAntigo.putAll(Primeiro);
+		
+		boolean alteracao = true;
+		while(alteracao){
+			String simbolo = "e";
 			ArrayList<Entrada> listaProducoesSimbolo = new ArrayList<Entrada>();
 			listaProducoesSimbolo.addAll(producoesDoSimbolo(simbolo));
-			while(alterou){
-				for(Entrada producao : listaProducoesSimbolo){
-					System.out.println("Producao : " + producao.getCompleto());
-					
-					
-					HashSet<String> conjuntoAuxSimbolo = new HashSet<String>();		// Armazena o conjunto daquele simbolo
-					conjuntoAuxSimbolo.addAll(Primeiro.get(simbolo));				// para ver se tem ou n√£o alteracoes
-					
-					int k =1;
-					boolean Continue = true;
-					int n = producao.getDireita().length();
-					while(Continue && k<=n){
-						Continue = false;
-						String simboloK = producao.getDireita().charAt(k-1)+"";
-						if(isTerminal(simboloK)){
-							Primeiro.get(simbolo).add(simboloK);
-						}else
-							Primeiro.get(simbolo).addAll(Primeiro.get(producao.getDireita().charAt(k-1)));
-						Primeiro.get(simbolo).remove("E");
-						
-						HashSet<String> conjuntoTeste = new HashSet<String>();
-						conjuntoTeste.addAll(Primeiro.get(simbolo));
-						if(conjuntoTeste.add("E")){		// nao tem Epsilon
-							Continue = false;
-						}
-						k++;
-					}
-					
-					if(Continue){
-						Primeiro.get(simbolo).add("E");
-					}
-					
-					
-					if(conjuntoAuxSimbolo.equals(Primeiro.get("E"))){
-						alterou = false;
-					}
-				}
-			}
 			
-			break;
-		case 3:
-			System.out.println("√â uma cadeia");
-			break;
-		case 0:
-			System.out.println("√â um epsilon");
-			break;
+			int k =1; boolean Continue = true;
+			for(Entrada producao : listaProducoesSimbolo){
+				int n = producao.getDireita().length();
+				
+				while(Continue && k<=n){
+					String simboloK = producao.getDireita().charAt(k-1)+"";
+					Primeiro.get(simbolo).addAll(Primeiro.get(simboloK)); Primeiro.get(simbolo).remove("E");
+					
+					// Testa se contem ou nao Epsilon
+					HashSet<String> conjuntoTeste = new HashSet<String>();
+					conjuntoTeste.addAll(Primeiro.get(simbolo));
+					if(conjuntoTeste.add("E")){		// nao tem Epsilon
+						Continue = false;
+					}
+					k++;
+				}
+				
+				if(Continue){
+					Primeiro.get(simbolo).add("E");
+				}
+				
+				
+				if(PrimeiroAntigo.equals(Primeiro)){
+					alteracao = false;
+					PrimeiroAntigo.putAll(Primeiro);
+					break;
+				}
+				
+				PrimeiroAntigo.putAll(Primeiro);
+			}	
 		}
-	}
-	
-	public static int distinguirCasos(String simbolo){
-			if(simbolo.length() == 1){
-				if(isTerminal(simbolo))
-					return 1;
-				else if(isVariavel(simbolo))
-					return 2;
-			}else{
-				return 3;
-			}
-			return 0;
 	}
 	
 	public static ArrayList<Entrada> producoesDoSimbolo(String simbolo){
@@ -159,7 +139,7 @@ public class Principal {
 				}
 			}
 		} catch (Exception e) {
-			System.out.println("N√£o tem conjunto! N√£o eh que esteja vazia, s√≥ n√£o existe!");
+			System.out.println("N„o tem conjunto! N„o eh que esteja vazia, sÛ n„o existe!");
 		}
 	}
 
@@ -216,14 +196,6 @@ public class Principal {
 			conjV.add(lista.getEsquerda());
 		}
 		return conjV;
-	}
-	
-	public static String getVariavelInicial(ArrayList<Entrada> lista){
-		if(lista.size()>0){
-			return lista.get(0).getEsquerda();
-		}
-		else
-			return null;
 	}
 	
 	public static Entrada setEntrada(String str){
