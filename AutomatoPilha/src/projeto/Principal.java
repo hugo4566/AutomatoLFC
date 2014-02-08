@@ -210,7 +210,68 @@ public class Principal {
 		}
 	}
 	
-	private static void doCaso3(HashMap<String, HashSet<String>> Primeiro) {}
+	private static void doCaso3(HashMap<String, HashSet<String>> Primeiro) {
+		
+		ArrayList<Entrada> listaCadeias = getListaCadeidas();
+		
+		for(Entrada cadeia: listaCadeias){
+			String w = cadeia.getDireita();
+			String X_1 = cadeia.getDireita().charAt(0)+"";
+			
+			// Cria o Primeiro(w) = Primeiro(X_1) - {E}
+			HashSet<String> cj1 = new HashSet<String>();
+			cj1.addAll(Primeiro.get(X_1));
+			cj1.remove("E");
+			
+			Primeiro.put(w, cj1);
+			
+			// Verificacao do Epsilon
+			boolean vazio = false;
+			HashSet<String> cjX_1Teste = new HashSet<String>();
+			cjX_1Teste.addAll(Primeiro.get(X_1));
+			if(!cjX_1Teste.add("E")){	// se Primeiro(X_1) tiver Epsilon 
+				vazio = true;
+			}
+			
+			int n = cadeia.getDireita().length();
+			
+			for(int i=2;i<=n;i++){
+				
+				if(vazio == false){
+					break;
+				}
+				
+				for(int k=1;k<=i-1;k++){
+					
+				}
+			}
+			
+		}
+
+		
+		
+		
+		
+//		Primeiro(w) := Primeiro(X_1) - {epsilon};
+//		if Primeiro(X_1) contiver epsilon then
+//			vazio := true;
+//		for cada i = 2 até n do
+//			if vazio = false then break;
+//			for cada k = 1 até i-1 do
+//				if Primeiro(X_k) não contiver epsilon then vazio := false;
+//			if vazio = true then adicione Primeiro(X_i)- {epsilon} a Primeiro(w);
+//		if vazio = true then adicione {epsilon} a Primeiro(w);
+	}
+	
+	public static ArrayList<Entrada> getListaCadeidas(){		// essa funcao retorna as producoes que tem cadeia, ou seja, tem tamanho>1
+		ArrayList<Entrada> listaCadeias = new ArrayList<Entrada>();
+		for(Entrada producao: Lista){
+			if(producao.getDireita().length()>1){
+				listaCadeias.add(producao);
+			}
+		}
+		return listaCadeias;
+	}
 	
 	private static int somaDosConjuntosPrimeiros(HashMap<String, HashSet<String>> Primeiro) {
 		int soma = 0;
