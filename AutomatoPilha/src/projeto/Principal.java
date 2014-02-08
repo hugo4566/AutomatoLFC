@@ -13,12 +13,14 @@ public class Principal {
 
 	static HashSet<String> conjuntoVariaveis;
 	static HashSet<String> conjuntoTerminais;
+	static HashSet<String> conjuntoSimbolos;
 	static ArrayList<Entrada> Lista;
 	
 	public static void main (String [] args) throws FileNotFoundException {
 		
 		conjuntoVariaveis = new HashSet<String>();
 		conjuntoTerminais = new HashSet<String>();
+		conjuntoSimbolos = new HashSet<String>();
 		
 		Lista = new ArrayList<Entrada>();
 		
@@ -34,6 +36,8 @@ public class Principal {
 		
 		conjuntoVariaveis = todasVariaveis(conjuntoVariaveis, Lista);
 		conjuntoTerminais = todosTerminais(conjuntoTerminais,conjuntoVariaveis, Lista);
+		conjuntoSimbolos.addAll(conjuntoVariaveis);
+		conjuntoSimbolos.addAll(conjuntoTerminais);
 
 		imprimirTodasVariaveis();
 		imprimirTodosTerminais();
@@ -51,6 +55,10 @@ public class Principal {
 		
 		// Caso 2 -- faco Primeiro(A):
 		doCaso2(Primeiro);
+		
+		for(String variavel:conjuntoVariaveis){
+			imprimaConjunto(Primeiro.get(variavel));
+		}
 	}
 
 	private static void doCaso1(HashMap<String, HashSet<String>> Primeiro) {
@@ -76,21 +84,27 @@ public class Principal {
 		
 		boolean alteracao = true;
 		while(alteracao){
-			String simbolo = "e";
+			for(String variavel:conjuntoVariaveis){
+			String simbolo = variavel;
 			ArrayList<Entrada> listaProducoesSimbolo = new ArrayList<Entrada>();
 			listaProducoesSimbolo.addAll(producoesDoSimbolo(simbolo));
 			
-			int k =1; boolean Continue = true;
 			for(Entrada producao : listaProducoesSimbolo){
 				int n = producao.getDireita().length();
 				
+				int k =1; boolean Continue = true;
 				while(Continue && k<=n){
 					String simboloK = producao.getDireita().charAt(k-1)+"";
-					Primeiro.get(simbolo).addAll(Primeiro.get(simboloK)); Primeiro.get(simbolo).remove("E");
+					
+					HashSet<String> conjuntoTesteK = new HashSet<String>();
+					conjuntoTesteK.addAll(Primeiro.get(simboloK));
+					conjuntoTesteK.remove("E");
+					
+					Primeiro.get(simbolo).addAll(conjuntoTesteK);
 					
 					// Testa se contem ou nao Epsilon
 					HashSet<String> conjuntoTeste = new HashSet<String>();
-					conjuntoTeste.addAll(Primeiro.get(simbolo));
+					conjuntoTeste.addAll(Primeiro.get(simboloK));
 					if(conjuntoTeste.add("E")){		// nao tem Epsilon
 						Continue = false;
 					}
@@ -100,16 +114,14 @@ public class Principal {
 				if(Continue){
 					Primeiro.get(simbolo).add("E");
 				}
-				
-				
-				if(PrimeiroAntigo.equals(Primeiro)){
-					alteracao = false;
-					PrimeiroAntigo.putAll(Primeiro);
-					break;
-				}
-				
-				PrimeiroAntigo.putAll(Primeiro);
-			}	
+			}
+			
+			if(!PrimeiroAntigo.equals(Primeiro)){
+				alteracao = false;
+			}
+			
+			PrimeiroAntigo.putAll(Primeiro);
+			}
 		}
 	}
 	

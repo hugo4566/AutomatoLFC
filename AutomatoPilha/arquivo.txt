@@ -1,1 +1,1 @@
-e->e+T,e->T,T->TxF,T->F,F->(e),F->n
+e->e+T,e->T,T->TxF,T->F,T->E,F->(e),F->n
