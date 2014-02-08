@@ -43,6 +43,7 @@ public class Principal {
 		imprimirTodosTerminais();
 		
 		HashMap<String, HashSet<String>> Primeiro = new HashMap<String, HashSet<String>>();
+		HashMap<String, HashSet<String>> Sequencia = new HashMap<String, HashSet<String>>();
 		
 		// Primeiro Epsilon
 		HashSet<String> cj = new HashSet<String>();
@@ -56,9 +57,52 @@ public class Principal {
 		// Caso 2 -- faco Primeiro(A):
 		doCaso2(Primeiro);
 		
+		// Caso 3 -- faco Primeiro(w), onde w = X_1X_2...X_n
+		doCaso3(Primeiro);
+		
+		doPasso4(Sequencia);
+		
 		for(String variavel:conjuntoVariaveis){
 			imprimaConjunto(Primeiro.get(variavel));
 		}
+	}
+
+	private static void doPasso4(HashMap<String, HashSet<String>> Sequencia) {
+		
+//		Sequencia(variável inicial) := {$};
+		HashSet<String> cj = new HashSet<String>();
+		cj.add("$");
+		Sequencia.put("§", cj);
+		
+//		for cada não-terminal A <> variável inicial do Sequencia(A) := {};
+		for(String variavel: conjuntoVariaveis){
+			HashSet<String> vazio = new HashSet<String>();
+			Sequencia.put(variavel, vazio);
+		}
+		
+		boolean alteracao = true;
+		while(alteracao){
+			for(String variavel:conjuntoVariaveis){
+				String simbolo = variavel;
+				ArrayList<Entrada> listaProducoesSimbolo = new ArrayList<Entrada>();
+				listaProducoesSimbolo.addAll(producoesDoSimbolo(simbolo));
+				
+				for(Entrada producao : listaProducoesSimbolo){
+					for(int i=1;i<producao.getDireita().length();i++){
+						String simboloI = producao.getDireita().charAt(i-1)+"";
+						if(isVariavel(simboloI)){
+							
+						}
+					}
+				}
+			}
+		}
+		
+//				for each X_i que for não terminal do
+//					adicione Primeiro(X_i+1 X_i+2 ... X_n) - {epsilon} a Sequencia(X_i);
+//					(* Nota: se i = n, então X_i+1 X_i+2 ... X_n = epsilon *)
+//					if epsilon estiver em Primeiro(X_i+1 X_i+2 ... X_n) then
+//						adicione Sequencia(A) a Sequencia(X_i)
 	}
 
 	private static void doCaso1(HashMap<String, HashSet<String>> Primeiro) {
@@ -84,6 +128,7 @@ public class Principal {
 		
 		boolean alteracao = true;
 		while(alteracao){
+			
 			for(String variavel:conjuntoVariaveis){
 			String simbolo = variavel;
 			ArrayList<Entrada> listaProducoesSimbolo = new ArrayList<Entrada>();
@@ -120,10 +165,13 @@ public class Principal {
 				alteracao = false;
 			}
 			
+//			System.out.println("Primeiro : "+Primeiro.toString()+"\n"+"PrimeiroAntigo : "+PrimeiroAntigo.toString());
 			PrimeiroAntigo.putAll(Primeiro);
 			}
 		}
 	}
+	
+	private static void doCaso3(HashMap<String, HashSet<String>> Primeiro) {}
 	
 	public static ArrayList<Entrada> producoesDoSimbolo(String simbolo){
 		ArrayList<Entrada> listaProducoes = new ArrayList<Entrada>();
