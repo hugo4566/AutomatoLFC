@@ -50,6 +50,10 @@ Para cada não-terminal A e escolha de produção A -> w, repita os dois passos 
 	1. Para cada terminal a em Primeiro(w), adicione A -> w a M[A, a].
 	2. Se epsilon perterncer a Primeiro(w), para cada elemento a de Sequencia(A), adicione A -> w a M[A,a].
 	
+	s->(S)S
+	S->E
+	
+	Sequencia(S)= {$,)}
 
 	
 Formato da entrada:

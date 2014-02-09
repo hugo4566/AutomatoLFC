@@ -1,7 +1,11 @@
 package projeto;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,7 +21,18 @@ public class Principal {
 	static HashSet<String> conjuntoSimbolos;
 	static ArrayList<Entrada> Lista;
 	
-	public static void main (String [] args) throws FileNotFoundException {
+	public static void main (String [] args) throws IOException {
+		
+//        File arquivoEntrada = new File( args[0] ); 
+//        fr = new FileReader( arquivoEntrada ); 
+//        br = new BufferedReader( fr ); 
+//
+//        
+//        File arquivoSaida = new File( args[1] );
+//        FileWriter fw = new FileWriter( arquivoSaida ); 
+//        BufferedWriter bw = new BufferedWriter( fw ); 
+        
+        
 		
 		conjuntoVariaveis = new HashSet<String>();
 		conjuntoTerminais = new HashSet<String>();
@@ -44,7 +59,7 @@ public class Principal {
 				listaDeTeste.add(str);
 			}
 		}
-		
+
 		scanner.close();
 		
 		conjuntoVariaveis = todasVariaveis(conjuntoVariaveis, Lista);
@@ -91,15 +106,10 @@ public class Principal {
 					tabela.add(tab);
 				}
 			}else{
-				int n = producao.getDireita().length();
-				for(int i=0;i<n;i++){
-					String simbolo = producao.getDireita().charAt(i)+"";
-					if(isTerminal(simbolo)){
-						if(!Sequencia.get(producao.getEsquerda()).contains(simbolo)){
-							Tabela tab = new Tabela(producao.getEsquerda(),simbolo,producao.getCompleto());
-							tabela.add(tab);
-						}
-					}
+				HashSet<String> primeiroW = Primeiro.get(producao.getDireita());
+				for(String a : primeiroW){
+					Tabela tab = new Tabela(producao.getEsquerda(),a,producao.getCompleto());
+					tabela.add(tab);
 				}
 			}
 		}
