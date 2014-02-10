@@ -27,16 +27,8 @@ public class Principal {
 	
 	public static void main (String [] args) throws IOException {
 		
-//        File arquivoEntrada = new File( args[0] ); 
-//        fr = new FileReader( arquivoEntrada ); 
-//        br = new BufferedReader( fr ); 
-//
-//        
-//        File arquivoSaida = new File( args[1] );
-//        FileWriter fw = new FileWriter( arquivoSaida ); 
-//        BufferedWriter bw = new BufferedWriter( fw ); 
-        
-        
+        FileWriter fw = new FileWriter( new File(args[1]) ); 
+        BufferedWriter bw = new BufferedWriter( fw ); 
 		
 		conjuntoVariaveis = new HashSet<String>();
 		conjuntoTerminais = new HashSet<String>();
@@ -51,7 +43,7 @@ public class Principal {
 		HashMap<String, HashSet<String>> Sequencia = new HashMap<String, HashSet<String>>();
 		
 		// Parser
-		Scanner scanner = new Scanner(new FileReader("arquivo.txt"));
+		Scanner scanner = new Scanner(new FileReader(args[0]));
 		boolean primeiro = true;
 		while (scanner.hasNext()) {
 			String str = scanner.next();
@@ -78,11 +70,10 @@ public class Principal {
 		// Primeiro Epsilon
 		HashSet<String> cj = new HashSet<String>();
 		cj.add("E");
-		Primeiro
-		.put("E", cj);	
+		Primeiro.put("E", cj);	
 		
 		
-		// Caso 1 -- faço Primeiro(a) = {a}
+		// Caso 1 -- faï¿½o Primeiro(a) = {a}
 		doCaso1(Primeiro);
 		
 		// Caso 2 -- faco Primeiro(A):
@@ -118,9 +109,6 @@ public class Principal {
 					String simboloPilha = pilha.get(pilha.size()-1);
 					String simboloCadeia = teste.charAt(i)+"";
 					
-//					System.out.println("Pilha : "+pilha.get(pilha.size()-1)+" ______ Cadeia : "+teste.charAt(i)+"");
-//					System.out.println(pilha.toString());
-					
 					String dado = pegaDadoTabela(simboloCadeia, simboloPilha);
 					if(dado != null){
 						empilhaDado(dado);
@@ -131,14 +119,16 @@ public class Principal {
 				}
 			}
 			
-//			System.out.println(pilha.toString());
-//			if(pilha.size()==0){
 			if(pilhaInicial.equals(pilha.toString())){
 				System.out.println("1");
+				bw.write("1\n");
 			}else{
 				System.out.println("0");
+				bw.write("0\n");
 			}
 		}
+		
+		bw.close();
 	}
 	
 	public static void empilhaDado(String dado){
@@ -186,12 +176,12 @@ public class Principal {
 
 		VARIAVEL_INICIAL = getVariavelInicial(Lista); 
 		
-		// Sequencia(variável inicial) := {$};
+		// Sequencia(variï¿½vel inicial) := {$};
 		HashSet<String> cj = new HashSet<String>();
 		cj.add("$");
 		Sequencia.put(VARIAVEL_INICIAL, cj);
 		
-		// for cada não-terminal A <> variável inicial do Sequencia(A) := {};
+		// for cada nï¿½o-terminal A <> variï¿½vel inicial do Sequencia(A) := {};
 		for(String variavel: conjuntoVariaveis){
 			if(!variavel.equals(VARIAVEL_INICIAL)){
 				HashSet<String> vazio = new HashSet<String>();
