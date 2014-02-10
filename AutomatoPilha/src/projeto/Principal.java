@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Stack;
 
 import dominios.Entrada;
 import dominios.Tabela;
@@ -20,6 +21,9 @@ public class Principal {
 	static HashSet<String> conjuntoTerminais;
 	static HashSet<String> conjuntoSimbolos;
 	static ArrayList<Entrada> Lista;
+	static ArrayList<Tabela> tabela;
+	static Stack<String> pilha;
+	static String VARIAVEL_INICIAL;
 	
 	public static void main (String [] args) throws IOException {
 		
@@ -40,7 +44,8 @@ public class Principal {
 		Lista = new ArrayList<Entrada>();
 		
 		ArrayList<String> listaDeTeste = new ArrayList<String>();
-		ArrayList<Tabela> tabela = new ArrayList<Tabela>();
+		tabela = new ArrayList<Tabela>();
+		pilha = new Stack<String>();
 		
 		HashMap<String, HashSet<String>> Primeiro = new HashMap<String, HashSet<String>>();
 		HashMap<String, HashSet<String>> Sequencia = new HashMap<String, HashSet<String>>();
@@ -73,7 +78,8 @@ public class Principal {
 		// Primeiro Epsilon
 		HashSet<String> cj = new HashSet<String>();
 		cj.add("E");
-		Primeiro.put("E", cj);	
+		Primeiro
+		.put("E", cj);	
 		
 		
 		// Caso 1 -- faço Primeiro(a) = {a}
@@ -95,6 +101,66 @@ public class Principal {
 		for(Tabela tab: tabela){
 			System.out.println("Coluna : "+tab.getColuna()+" .. Linha : "+tab.getLinha()+" .. Dado : "+tab.getDado());
 		}
+		
+		for(String teste : listaDeTeste){
+			System.out.println("\nExemplo de Teste : "+teste);
+			pilha = new Stack<String>();
+			pilha.add("$");
+			pilha.add(VARIAVEL_INICIAL);
+			
+			String pilhaInicial = pilha.toString();
+			
+			int n = teste.length();
+			for(int i=0;i<n;i++){
+				boolean tem = true;
+				while(tem){
+					
+					String simboloPilha = pilha.get(pilha.size()-1);
+					String simboloCadeia = teste.charAt(i)+"";
+					
+//					System.out.println("Pilha : "+pilha.get(pilha.size()-1)+" ______ Cadeia : "+teste.charAt(i)+"");
+//					System.out.println(pilha.toString());
+					
+					String dado = pegaDadoTabela(simboloCadeia, simboloPilha);
+					if(dado != null){
+						empilhaDado(dado);
+						tem = false;
+					}else{
+						pilha.remove(pilha.size()-1);
+					}
+				}
+			}
+			
+//			System.out.println(pilha.toString());
+//			if(pilha.size()==0){
+			if(pilhaInicial.equals(pilha.toString())){
+				System.out.println("1");
+			}else{
+				System.out.println("0");
+			}
+		}
+	}
+	
+	public static void empilhaDado(String dado){
+		String dadoSemSeta = dado.substring(2,dado.length());
+		pilha.remove(pilha.size()-1);
+		int n = dadoSemSeta.length()-1;
+		if(n==1){
+			pilha.remove(pilha.size()-1);
+		}else{
+			for(int i=n;i>0;i--){
+				pilha.add(dadoSemSeta.charAt(i)+"");
+			}
+		}
+	}
+	
+	public static String pegaDadoTabela(String coluna,String linha){
+		for(Tabela tab: tabela){
+			if(coluna.equals(tab.getColuna()) && linha.equals(tab.getLinha())){
+				return tab.getDado();
+			}
+		}
+		return null;
 	}
 
 	private static void criadorDeTabela(HashMap<String, HashSet<String>> Primeiro, HashMap<String, HashSet<String>> Sequencia, ArrayList<Tabela> tabela) {
@@ -118,7 +184,7 @@ public class Principal {
 	private static void doPasso4(HashMap<String, HashSet<String>> Sequencia,HashMap<String, HashSet<String>> Primeiro) {
 		
 
-		String VARIAVEL_INICIAL = getVariavelInicial(Lista); 
+		VARIAVEL_INICIAL = getVariavelInicial(Lista); 
 		
 		// Sequencia(variável inicial) := {$};
 		HashSet<String> cj = new HashSet<String>();
