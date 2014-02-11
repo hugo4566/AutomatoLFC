@@ -24,11 +24,12 @@ public class Principal {
 	static ArrayList<Tabela> tabela;
 	static Stack<String> pilha;
 	static String VARIAVEL_INICIAL;
+	static BufferedWriter bw;
 	
 	public static void main (String [] args) throws IOException {
 		
         FileWriter fw = new FileWriter( new File(args[1]) ); 
-        BufferedWriter bw = new BufferedWriter( fw ); 
+        bw = new BufferedWriter( fw ); 
 		
 		conjuntoVariaveis = new HashSet<String>();
 		conjuntoTerminais = new HashSet<String>();
@@ -53,7 +54,7 @@ public class Principal {
 					Lista.add(setEntrada(entrada));
 				primeiro = false;
 			}else{
-				listaDeTeste.add(str);
+				listaDeTeste.add(str+"$");
 			}
 		}
 
@@ -86,11 +87,11 @@ public class Principal {
 		
 		criadorDeTabela(Primeiro, Sequencia, tabela);
 		
-		System.out.println(Primeiro.toString());
-		System.out.println(Sequencia.toString());
+//		System.out.println(Primeiro.toString());
+//		System.out.println(Sequencia.toString());
 		
 		for(Tabela tab: tabela){
-			System.out.println("Coluna : "+tab.getColuna()+" .. Linha : "+tab.getLinha()+" .. Dado : "+tab.getDado());
+//			System.out.println("Coluna : "+tab.getColuna()+" .. Linha : "+tab.getLinha()+" .. Dado : "+tab.getDado());
 		}
 		
 		for(String teste : listaDeTeste){
@@ -99,47 +100,55 @@ public class Principal {
 			pilha.add("$");
 			pilha.add(VARIAVEL_INICIAL);
 			
-			String pilhaInicial = pilha.toString();
-			
-			int n = teste.length();
-			for(int i=0;i<n;i++){
-				boolean tem = true;
-				while(tem){
-					
-					String simboloPilha = pilha.get(pilha.size()-1);
-					String simboloCadeia = teste.charAt(i)+"";
-					
-					String dado = pegaDadoTabela(simboloCadeia, simboloPilha);
-					if(dado != null){
-						empilhaDado(dado);
-						tem = false;
-					}else{
-						pilha.remove(pilha.size()-1);
-					}
-				}
-			}
-			
-			if(pilhaInicial.equals(pilha.toString())){
-				System.out.println("1");
-				bw.write("1\n");
-			}else{
-				System.out.println("0");
-				bw.write("0\n");
-			}
+			int resultado = testarCadeia(teste);
+			System.out.println(resultado);
+			bw.write(resultado+"\n");
 		}
 		
 		bw.close();
 	}
+
+	public static int testarCadeia(String teste) throws IOException {
+		
+		int n = teste.length();
+		for(int i=0;i<n;i++){
+			boolean naoProssiga = true;
+			while(naoProssiga){
+				
+				String simboloPilha = pilha.get(pilha.size()-1);
+				String simboloCadeia = teste.charAt(i)+"";
+				
+				String dado = pegaDadoTabela(simboloCadeia, simboloPilha);
+				if(dado != null){
+					empilhaDado(dado);
+				}else{
+					if(simboloCadeia.equals(simboloPilha)){
+						pilha.remove(pilha.size()-1);
+						naoProssiga = false;
+					}
+					else{
+						return 0;
+					}
+				}
+			}
+		}
+		
+		if(pilha.isEmpty()){
+			return 1;
+		}else{
+			return 0;
+		}
+	}
 	
 	public static void empilhaDado(String dado){
-		String dadoSemSeta = dado.substring(2,dado.length());
-		pilha.remove(pilha.size()-1);
-		int n = dadoSemSeta.length()-1;
+		String dadoSemSeta = dado.substring(3,dado.length());
+		int n = dadoSemSeta.length();
 		if(n==1){
 			pilha.remove(pilha.size()-1);
 		}else{
+			pilha.remove(pilha.size()-1);
 			for(int i=n;i>0;i--){
-				pilha.add(dadoSemSeta.charAt(i)+"");
+				pilha.add(dadoSemSeta.charAt(i-1)+"");
 			}
 		}
 	}
