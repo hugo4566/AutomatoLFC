@@ -1,10 +1,5 @@
 package projeto;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,12 +19,8 @@ public class Principal {
 	static ArrayList<Tabela> tabela;
 	static Stack<String> pilha;
 	static String VARIAVEL_INICIAL;
-	static BufferedWriter bw;
 	
 	public static void main (String [] args) throws IOException {
-		
-        FileWriter fw = new FileWriter( new File(args[1]) ); 
-        bw = new BufferedWriter( fw ); 																// crio um BW para escrever no arquivo
 		
 		conjuntoVariaveis = new HashSet<String>();													// crio conjunto de variaveis
 		conjuntoTerminais = new HashSet<String>();													// crio conjunto de terminais
@@ -43,23 +34,20 @@ public class Principal {
 		HashMap<String, HashSet<String>> Primeiro = new HashMap<String, HashSet<String>>();			// crio meu HashMap para ser o Primeiro
 		HashMap<String, HashSet<String>> Sequencia = new HashMap<String, HashSet<String>>();		// crio meu HashMap para ser o Sequencia
 		
-		// Leio o arquivo e preencho minha lista de producoes e minha lista de dados para teste
-		Scanner scanner = new Scanner(new FileReader(args[0]));
-		boolean primeiro = true;
-		while (scanner.hasNext()) {
-			String str = scanner.next();
+		Scanner scan = new Scanner(System.in);
+        String line;
+        boolean primeiro = true;
+		while (!(line = scan.nextLine()).equals("")){
 			if(primeiro == true){
-				String s[] = str.split(",");
+				String s[] = line.split(",");
 				for(String entrada : s)
 					Lista.add(setEntrada(entrada));
 				primeiro = false;
 			}else{
-				listaDeTeste.add(str+"$");
+				listaDeTeste.add(line+"$");
 			}
 		}
 
-		scanner.close();
-		
 		conjuntoVariaveis = todasVariaveis(conjuntoVariaveis, Lista);							// preencho meu conjunto de variaveis
 		conjuntoTerminais = todosTerminais(conjuntoTerminais,conjuntoVariaveis, Lista);			// preencho meu conjunto de terminais
 		conjuntoSimbolos.addAll(conjuntoVariaveis);												// preencho meu conjunto de simbolos com o conjunto de variaveis
@@ -85,25 +73,22 @@ public class Principal {
 		// Preencho a tabela com as informacoes
 		criadorDeTabela(Primeiro, Sequencia, tabela);
 		
-		System.out.println(Primeiro.toString());
-		System.out.println(Sequencia.toString());
-		
-		for(Tabela tab: tabela){
-			System.out.println("Coluna : "+tab.getColuna()+" .. Linha : "+tab.getLinha()+" .. Dado : "+tab.getDado());
-		}
+//		System.out.println(Primeiro.toString());
+//		System.out.println(Sequencia.toString());
+//		
+//		for(Tabela tab: tabela){
+//			System.out.println("Coluna : "+tab.getColuna()+" .. Linha : "+tab.getLinha()+" .. Dado : "+tab.getDado());
+//		}
 		
 		for(String teste : listaDeTeste){
-			System.out.println("\nExemplo de Teste : "+teste);
+//			System.out.println("\nExemplo de Teste : "+teste);
 			pilha = new Stack<String>();					// inicializo a pilha
 			pilha.add("$");									// boto $ na pilha
 			pilha.add(VARIAVEL_INICIAL);					// boto a VARIAVEL_INICIAL na pilha
 			
 			int resultado = testarCadeia(teste);
 			System.out.println(resultado);
-			bw.write(resultado+"\n");
 		}
-		
-		bw.close();
 	}
 
 	// Metodo para testar a cadeia de teste
