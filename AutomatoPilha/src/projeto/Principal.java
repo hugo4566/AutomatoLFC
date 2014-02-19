@@ -44,7 +44,7 @@ public class Principal {
 					Lista.add(setEntrada(entrada));
 				primeiro = false;
 			}else{
-				listaDeTeste.add(line+"$");
+				listaDeTeste.add(line.replaceAll(" ", "")+"$");
 			}
 		}
 
@@ -53,7 +53,7 @@ public class Principal {
 		conjuntoSimbolos.addAll(conjuntoVariaveis);												// preencho meu conjunto de simbolos com o conjunto de variaveis
 		conjuntoSimbolos.addAll(conjuntoTerminais);												// preencho meu conjunto de simbolos com o conjunto de terminais
 		
-		// Faço o Primeiro(Epsilon) = {E} , para caso seja chamado
+		// Faï¿½o o Primeiro(Epsilon) = {E} , para caso seja chamado
 		HashSet<String> cj = new HashSet<String>();
 		cj.add("E");
 		Primeiro.put("E", cj);	
@@ -67,7 +67,7 @@ public class Principal {
 		// Caso 3 -- faco Primeiro(w), onde w = X_1X_2...X_n
 		doCaso3(Primeiro);
 		
-		// Passo 4 -- é reponsavel por preencher as Sequencias
+		// Passo 4 -- ï¿½ reponsavel por preencher as Sequencias
 		doPasso4(Sequencia,Primeiro);
 		
 		// Preencho a tabela com as informacoes
@@ -81,7 +81,7 @@ public class Principal {
 //		}
 		
 		for(String teste : listaDeTeste){
-//			System.out.println("\nExemplo de Teste : "+teste);
+			System.out.println("\nExemplo de Teste : "+teste);
 			pilha = new Stack<String>();					// inicializo a pilha
 			pilha.add("$");									// boto $ na pilha
 			pilha.add(VARIAVEL_INICIAL);					// boto a VARIAVEL_INICIAL na pilha
@@ -118,7 +118,7 @@ public class Principal {
 		}
 		
 		if(pilha.isEmpty()){
-			return 1;											// se a pilha esvaziou é pq foi percorrida com sucesso
+			return 1;											// se a pilha esvaziou ï¿½ pq foi percorrida com sucesso
 		}else{
 			return 0;											// senao foi fracasso
 		}
