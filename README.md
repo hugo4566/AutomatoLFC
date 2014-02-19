@@ -12,7 +12,9 @@ AutomatoLFC
 <br>(1+1)
 <br>((1)+1)
 <br>((1+1)+1)
-<br>
+<br> *espaço*
+<br>*nada escrito, finaliza e testa cadeias*
 <br>1
 <br>0
 <br>1
+<br>0
