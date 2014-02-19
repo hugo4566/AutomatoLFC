@@ -1,2 +1,0 @@
-S->I#,I->Ti,i->+Ti,i->-Ti,i->E,T->Ft,t->*Ft,t->/Ft,t->E,F->c,F->(I)
-c#
