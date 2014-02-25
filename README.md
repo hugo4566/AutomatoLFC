@@ -1,6 +1,12 @@
 AutomatoLFC
 ===========
 
+##Como encontrar JAR:
+>O jar se encontra em AutomatoPilha > programa.jar
+
+##Para executar em linux/ubuntu:
+>java -jar programa.jar
+
 ##Como usar:
 
 >A primeira linha que deve ser escrita no console.Por Exemplo : <br>S->F,S->(S+F),F->1
