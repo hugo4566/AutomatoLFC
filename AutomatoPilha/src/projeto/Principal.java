@@ -81,7 +81,7 @@ public class Principal {
 //		}
 		
 		for(String teste : listaDeTeste){
-			System.out.println("\nExemplo de Teste : "+teste);
+//			System.out.println("\nExemplo de Teste : "+teste);
 			pilha = new Stack<String>();					// inicializo a pilha
 			pilha.add("$");									// boto $ na pilha
 			pilha.add(VARIAVEL_INICIAL);					// boto a VARIAVEL_INICIAL na pilha
